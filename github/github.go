@@ -10,15 +10,16 @@ import (
 
 //SearchIssues searches issues
 func SearchIssues(terms []string) (*IssuesSearchResult, error) {
-	q := url.QueryEscape(strings.Join(terms, " "))
-	resp, err := http.Get(IssuesURL + "?q=" + q)
+	query := strings.Join(terms, " ")
+	q := url.QueryEscape(query)
+	resp, err := http.Get(IssuesSearchURL + "?q=" + q)
 	if err != nil {
 		return nil, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		resp.Body.Close()
-		return nil, fmt.Errorf("Сбой запроса: %s", resp.Status)
+		return nil, fmt.Errorf("Query error: %s", resp.Status)
 	}
 
 	var result IssuesSearchResult

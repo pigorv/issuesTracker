@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+	"time"
 	"fmt"
 	"github.com/pigorv/issuesTracker/github"
 	"log"
@@ -13,9 +15,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%d тем:\n", result.TotalCount)
+	fmt.Printf("%d issues:\n", result.TotalCount)
+	var currentMonthCreated []string
+	timeNow := time.Now()
 	for _, item := range result.Items {
-		fmt.Printf("#%-5d %9.9s %.55s\n", item.Number, item.User.Login, item.Title)
+		if item.CreatedAt.Month() == timeNow.Month() && item.CreatedAt.Year() == timeNow.Year() {
+			line := fmt.Sprintf("#%-5d %9.9s %.55s Created:%s", item.Number, item.User.Login, item.Title, item.CreatedAt)
+			currentMonthCreated = append(currentMonthCreated, line)
+		}
+		println(strings.Join(currentMonthCreated,"\n"))
 	}
 
 }

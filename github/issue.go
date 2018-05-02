@@ -2,7 +2,7 @@ package github
 
 import "time"
 
-const IssuesURL = "https://api.github.com/search/issues"
+const IssuesSearchURL = "https://api.github.com/search/issues"
 
 type IssuesSearchResult struct {
 	TotalCount int `json:"total_count"`
@@ -22,4 +22,12 @@ type Issue struct {
 type User struct {
 	Login   string
 	HTMLURL string `json:"html_url"`
+}
+
+type IssueContent struct {
+	Title string
+	Body string
+	Milestone int
+	Labels []string
+	Assigness []string
 }
