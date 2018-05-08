@@ -1,40 +1,32 @@
 package main
 
 import (
-	"github.com/pigorv/issuesTracker/github"
+	"fmt"
+	"strings"
+	"net/http"
 	"log"
-	"os"
-	"html/template"
+	"github.com/pigorv/issuesTracker/loader"
 )
 
-var issueList = template.Must(
-	template.New("issueList").Parse(
-		`<h1>{{.TotalCount}} issues </h1>
-		<table>
-			<tr style='text-align: left'>
-				<th>#</th>
-				<th>State</th>
-				<th>User</th>
-				<th>Title</th>
-			</tr>
-			{{range .Items}}
-			<tr>
-				<td><a href='{{.HTMLURL}}'>{{.Number}}</a></td>
-				<td>{{.State}}</td>
-				<td><a href='{{.User.HTMLURL}}'>{{.User.Login}}</a></td>
-				<td><a href='{{.HTMLURL}}'>{{.Title}}</a></td>
-			</tr>
-			{{end}}
-		</table>
-		`))
+const mainPage = `
+	<div>
+		<form action='/search' method='get'>
+			Search Issues:<br>
+  			<input type="text" name="q"><br>
+  			<input type="submit" value="Submit">
+		</form>
+	</div>`
 
-func main() {
-	result, err := github.SearchIssues(os.Args[1:])
-	if err != nil {
-		log.Fatal(err)
-	}
+func main()  {
+	http.HandleFunc("/", mainHandler)
+	http.HandleFunc("/search", searchHandler)
+	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+}
 
-	if err := issueList.Execute(os.Stdout, result); err != nil {
-		log.Fatal(err)
-	} 
+func mainHandler(w http.ResponseWriter, r *http.Request)  {
+	fmt.Fprintf(w, mainPage)
+}
+
+func searchHandler(w http.ResponseWriter, r *http.Request)  {
+	loader.WriteToHtmlPage(strings.Split(r.URL.RawQuery, "%20"), w)
 }
